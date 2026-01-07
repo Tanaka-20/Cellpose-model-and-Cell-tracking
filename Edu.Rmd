@@ -1,0 +1,186 @@
+---
+title: "Edu"
+author: "Tanaka"
+date: "2025-11-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readr)   
+library(ggplot2)
+library(tidyverse)
+library(dplyr)
+library(stringr)
+
+```
+```{r}
+getwd()
+```
+
+```{r}
+data<- read.csv("Edu.csv")
+```
+
+
+```{r}
+head(data)
+```
+```{r}
+colnames(data)
+```
+
+```{r}
+df <- data %>%
+  mutate(Label = as.character(Label)) %>%
+  mutate(Condition = stringr::str_extract(Label, "^A\\d{2}")) %>%
+  filter(Condition %in% sprintf("A%02d", 1:6)) %>%
+  mutate(Condition = factor(Condition, levels = sprintf("A%02d", 1:6))) %>%
+  mutate(Mean = as.numeric(Mean)) %>%
+  drop_na(Mean)
+```
+
+```{r}
+# 3) Violin plot (with optional boxplot + jitter)
+p <- ggplot(df, aes(x = Condition, y = Mean)) +
+  geom_violin(trim = FALSE, alpha = 0.8) +
+  geom_boxplot(width = 0.12, outlier.shape = NA, alpha = 0.6) +
+  geom_jitter(width = 0.08, height = 0, alpha = 0.35, size = 1) +
+  
+   
+  
+  
+  labs(
+    title = "Mean Intensity Distribution by Condition",
+    x = "Condition",
+    y = "Mean Intensity"
+  ) +
+  theme_minimal(base_size = 12)
+
+print(p)
+```
+
+```{r}
+
+
+# Build Condition = "01".."06" from labels like A01, B01, C01, etc.
+df <- data %>%
+  mutate(
+    Label = str_trim(toupper(as.character(Label))),
+    # grab the two digits immediately after the first letter
+    Condition = str_extract(Label, "(?<=^[A-Z])\\d{2}"),
+    Mean = as.numeric(Mean)
+  ) %>%
+  # keep only conditions 01..06
+  filter(Condition %in% sprintf("%02d", 1:6)) %>%
+  mutate(Condition = factor(Condition, levels = sprintf("%02d", 1:6))) %>%
+  drop_na(Mean)
+
+
+```
+
+
+```{r}
+
+
+p <- ggplot(df, aes(x = Condition, y = Mean)) +
+  geom_violin(trim = FALSE, alpha = 0.8) +
+  geom_boxplot(width = 0.12, outlier.shape = NA, alpha = 0.6) +
+  geom_jitter(width = 0.08, height = 0, alpha = 0.35, size = 1) +
+  labs(
+    title = "Mean Intensity Distribution by Condition (A/B/C merged)",
+    x = "Condition (01–06)",
+    y = "Mean Intensity"
+  ) +
+  theme_minimal(base_size = 12)
+
+print(p)
+
+```
+
+```{r}
+df <- data %>%
+  mutate(
+    Label = str_trim(toupper(as.character(Label))),
+    Condition = str_extract(Label, "(?<=^[A-Z])\\d{2}"),
+    Mean = as.numeric(Mean)
+  ) %>%
+
+  filter(Condition %in% sprintf("%02d", 1:6)) %>%
+
+  filter(Mean <= 200) %>%
+  mutate(Condition = factor(Condition, levels = sprintf("%02d", 1:6))) %>%
+  drop_na(Mean)
+```
+
+
+
+```{r}
+p <- ggplot(df, aes(x = Condition, y = Mean, fill = Condition)) +
+  geom_violin(trim = FALSE, alpha = 0.8, width = 1, color = "black") +
+  scale_y_continuous(breaks = seq(0, 200, by = 50), limits = c(0, 200)) +
+  labs(
+    title = "Mean Intensity Distribution by Condition (combined)",
+    x = "Condition (01–06)",
+    y = "Mean Intensity"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(legend.position = "none")
+
+print(p)
+
+```
+
+
+```{r}
+
+ggplot(df, aes(x = Condition, y = Mean, fill = Condition)) +
+  geom_violin(trim = FALSE, alpha = 0.8, color = "black", width = 1) +
+  
+  # Mean ± SD in red
+  stat_summary(fun = mean, geom = "point", color = "red", size = 3) +
+  stat_summary(fun.data = mean_sdl, geom = "errorbar", width = 0.2, color = "red") +
+  scale_y_continuous(breaks = seq(0, 200, by = 50), limits = c(0, 200)) +
+  labs(
+    title = "Mean Intensity Distribution by Condition ",
+    x = "Condition (01–06)",
+    y = "Mean Intensity"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(legend.position = "none")
+```
+
+
+```{r}
+p <- ggplot(df, aes(x = Condition, y = Mean, fill = Condition)) +
+  geom_boxplot(width = 0.6, alpha = 0.8, color = "black", outlier.shape = NA) +
+  scale_y_continuous(breaks = seq(0, 200, by = 25), limits = c(0, 200)) +
+  labs(
+    title = "Mean Intensity by Condition combined)",
+    x = "Condition (01–06)",
+    y = "Mean Intensity"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(legend.position = "none")
+
+print(p)
+```
+```{r}
+
+summary_stats <- df %>%
+  group_by(Condition) %>%
+  summarise(
+    n = n(),                            
+    mean_intensity = mean(Mean, na.rm = TRUE),
+    sd_intensity = sd(Mean, na.rm = TRUE),
+    se_intensity = sd_intensity / sqrt(n)   
+  )
+
+print(summary_stats)
+```
+
+
+
