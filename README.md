@@ -38,8 +38,9 @@ The Cellpose algorithm was originally trained on more than 70,000 segmented cell
 
 While Cellpose performs well out-of-the-box, fine-tuning improves accuracy for images that differ from the general training set (e.g., unique morphologies, contrast variations, or noise).
 
-# Iterative Training Cycle
+## Iterative Training Cycle
 
+<img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/4c37f3e8-8500-4795-83e8-337e1b32d8fb" />
 
 Following the attached flow cycle above. 
 1. Annotation:
@@ -53,129 +54,85 @@ Following the attached flow cycle above.
 
 Used a total training set of 5 images, with almost 4,500–4,700  regions of intrests (ROIs)and  each image manually refined to ensure accurate cell boundary detection.
 
+## ROI Detection Before and After Fine-Tuning
 
-{Image
-Approx. ROI Count (Before Fine-Tuning)
-After Fine-Tuning
-Image 1
-about 670
-749
-Image 2
-close to 820
-951
-Image 3
-1084
-1 118
-Image 4
-about 1000
-1 121
-Image 5
-1 091
-1 120: }
+| Image   | Approx. ROI Count (Before Fine-Tuning) | ROI Count (After Fine-Tuning) |
+|---------|----------------------------------------|-------------------------------|
+| Image 1 | ~670                                   | 749                           |
+| Image 2 | ~820                                   | 951                           |
+| Image 3 | 1084                                   | 1118                          |
+| Image 4 | ~1000                                  | 1121                          |
+| Image 5 | 1091                                   | 1120                          |
 
+*Fine-tuning improved ROI detection consistency and increased total detected regions across all images.*
 
-Image
-Approx. ROI Count (Before Fine-Tuning)
-After Fine-Tuning
-Image 1
-about 670
-749
-Image 2
-close to 820
-951
-Image 3
-1084
-1 118
-Image 4
-about 1000
-1 121
-Image 5
-1 091
-1 120
-
-Image
-Approx. ROI Count (Before Fine-Tuning)
-After Fine-Tuning
-Image 1
-about 670
-749
-Image 2
-close to 820
-951
-Image 3
-1084
-1 118
-Image 4
-about 1000
-1 121
-Image 5
-1 091
-1 120
-Image
-Approx. ROI Count (Before Fine-Tuning)
-After Fine-Tuning
-
-
-Model Improvement
+## Model Improvement
 
 The fine-tuned model demonstrated increased segmentation accuracy (e.g., improved ROI count from 1084 to 1 118 in Image 3). As shown below in pictures. same picture on the base model vs on the custom tuned model 
 Performance verified visually and by comparing cell count consistency across test images.
 
+<img width="1204" height="800" alt="image" src="https://github.com/user-attachments/assets/fd939659-5da9-4a3d-b382-744e56131712" />
 
+<img width="1202" height="787" alt="image" src="https://github.com/user-attachments/assets/774bda87-afc0-4330-9297-39af6e370911" />
 
-
-Automated Segmentation and ROI Generation (Python Workflow)
+## Automated Segmentation and ROI Generation (Python Workflow)
 
 Segmentation in Python
 - The fine-tuned Cellpose model was implemented in a Python environment to perform automated segmentation on all phase-contrast images from the six conditions.
 - For each image, the model generated:
 	- Segmentation masks (as labeled _mask tif).
 	- ROI coordinates corresponding to detected cells.
-- The python code used is in the notebook attached below.
+- The python code used is in the notebook attached as .ipynb file .
 
 
+<img width="1296" height="964" alt="image" src="https://github.com/user-attachments/assets/cf2cd8a2-86eb-4252-88a3-b3ad32cb7881" />
+
+<img width="1296" height="964" alt="image" src="https://github.com/user-attachments/assets/664dd3fb-188a-48ea-b4e2-ce4b06404d74" />
 
 
-
-Output generation
+## Output generation
 
 Each segmented image was automatically saved as a mask file, where each cell region was uniquely labeled.
+<img width="1309" height="1023" alt="image" src="https://github.com/user-attachments/assets/9fcbea6c-67f8-458a-9cfa-b23add2284fc" />
 
 These mask images served as input for downstream fluorescence quantification.
 
-ROI Transfer to Fiji
+## ROI Transfer to Fiji
 
 The generated mask files were imported into Fiji (ImageJ) using a custom macro script.
 The macro extracted individual ROIs (regions of interest) from each mask and applied them precisely to the corresponding EdU fluorescence images to ensure pixel-to-pixel alignment with the phase-contrast segmentation.
 
 
-Fluorescence Quantification (Fiji Workflow)
+# Fluorescence Quantification (Fiji Workflow)
 
-Background Subtraction
+## Background Subtraction
 - To eliminate uneven illumination and background fluorescence, a rolling-ball radius of 50 pixels was applied to each EdU image prior to intensity measurement.
 To fix an uneven background use the menu command Process › Subtract background. This will use a rolling ball algorithm on the uneven background. The radius should be set to at least the size of the largest object that is not part of the background. It can also be used to remove background from gels where the background is white. Running the command several times may produce better results. The user can choose whether or not to have a light background, create a background with no subtraction, have a sliding paraboloid, disable smoothing, or preview the results. The default value for the rolling ball radius is 50 pixels. https://imagej.net/imaging/image-intensity-processing
 
-   Intensity Measurement
+    Intensity Measurement
 - Using the imported ROIs, Fiji measured mean fluorescence intensity, integrated density, and area for every segmented cell.
 - Measurements were exported automatically to Excel/CSV files per condition.
-Data Consolidation
+## Data Consolidation
 - The exported spreadsheets were aggregated and organized by treatment condition (Condition 1 – 6), forming the basis for statistical and visual analyses.
 
-Data Analysis and Visualization
+## Data Analysis and Visualization
 
 1. Combined fluorescence data were analyzed in  R and box plots/violin plots were generated:
 showing per-cell EdU intensity distributions across six conditions.
+Code used is attached in Edu.Rmd file 
+
+<img width="1066" height="639" alt="image" src="https://github.com/user-attachments/assets/390cc01b-d19f-4567-8c36-7e33ac122b2e" />
+<img width="1056" height="649" alt="image" src="https://github.com/user-attachments/assets/d3a1cbe2-2292-40a8-bc5d-83a3dfbd94eb" />
 
 
 
-
-Discussion
+## Discussion
 
 The combination of Cellpose deep-learning segmentation with Fiji-based fluorescence quantification provided an efficient and reproducible workflow for single-cell analysis.
 Fine-tuning on only five images (with close to1000 ROIs each) significantly improved model precision, increasing the number of correctly identified cells and enhancing mask accuracy.
 By coupling the automated segmentation from Python with quantitative fluorescence measurements in Fiji, the pipeline minimized manual error, standardized data collection, and allowed for direct comparison of EdU intensity across all six treatment conditions.
 
-Conclusion 
+## Conclusion 
 
 Fine-tuning of Cellpose significantly improved segmentation accuracy and cell count consistency.
 The hybrid Python + Fiji pipeline streamlined the process—combining:
