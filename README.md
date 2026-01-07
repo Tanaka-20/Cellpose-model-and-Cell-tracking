@@ -6,20 +6,20 @@
 Phase Contrast is a light microscopy technique used to enhance the contrast of images of transparent and colourless specimens.
 And a fluorescent image is an image captured using a fluorescence microscope, where fluorescent dyes or proteins are excited by light of a specific wavelength and then emit light at a longer wavelength. The emitted light is detected and visualized as bright regions against a dark background.
 
-Objective:
+## Objective:
 
 
 To quantify EdU (fluorescent) signal intensities across six treatment conditions by generating accurate cell masks from phase-contrast images using a fine-tuned Cellpose model.
 
-Rationale:
+## Rationale:
 
 
 Fluorescence microscopy provides spatial and intensity-based information on biological activity. However, manual segmentation is time-consuming and prone to variability. The goal was to use deep learning-based segmentation to automate this process with high precision.
 
-Experimental Setup
+## Experimental Setup
 
 
-Image Samples
+## Image Samples
 
 - Conditions: Six different  treatments A-C (Condition 1–6).
 - Image Types per condition:
@@ -27,18 +27,18 @@ Image Samples
 	- EdU fluorescence images – proliferation marker with Edu(green colour).acts as a phluorescent channel.
 	- TO-PRO-3 fluorescence images – label  for total cell count reference.
 
-Model Training Workflow
+# Model Training Workflow
 
 
-Base Model
+## Base Model
 
 The Cellpose algorithm was originally trained on more than 70,000 segmented cells from diverse datasets, enabling strong generalization across cell types and imaging modalities.
 
-Fine-Tuning Rationale
+## Fine-Tuning Rationale
 
 While Cellpose performs well out-of-the-box, fine-tuning improves accuracy for images that differ from the general training set (e.g., unique morphologies, contrast variations, or noise).
 
-Iterative Training Cycle
+# Iterative Training Cycle
 
 
 Following the attached flow cycle above. 
@@ -49,9 +49,31 @@ Following the attached flow cycle above.
 3. Correction and Validation:
    The model was tested on new images, and errors were corrected in subsequent iterations.
 
-Training Dataset Details
+## Training Dataset Details
 
 Used a total training set of 5 images, with almost 4,500–4,700  regions of intrests (ROIs)and  each image manually refined to ensure accurate cell boundary detection.
+
+
+{Image
+Approx. ROI Count (Before Fine-Tuning)
+After Fine-Tuning
+Image 1
+about 670
+749
+Image 2
+close to 820
+951
+Image 3
+1084
+1 118
+Image 4
+about 1000
+1 121
+Image 5
+1 091
+1 120: }
+
+
 Image
 Approx. ROI Count (Before Fine-Tuning)
 After Fine-Tuning
@@ -70,6 +92,29 @@ about 1000
 Image 5
 1 091
 1 120
+
+Image
+Approx. ROI Count (Before Fine-Tuning)
+After Fine-Tuning
+Image 1
+about 670
+749
+Image 2
+close to 820
+951
+Image 3
+1084
+1 118
+Image 4
+about 1000
+1 121
+Image 5
+1 091
+1 120
+Image
+Approx. ROI Count (Before Fine-Tuning)
+After Fine-Tuning
+
 
 Model Improvement
 
